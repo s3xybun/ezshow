@@ -1,0 +1,31 @@
+# Build and local caches
+/.gradle/
+/.gradle-user-home/
+/build/
+/bin/
+/out/
+/mcmodsrepo/
+
+# Development game instances and logs
+/run/
+/run-*/
+/logs/
+/eclipse/
+*.log
+hs_err_pid*.log
+replay_pid*.log
+
+# IDE metadata
+/.idea/
+/.metadata/
+/.settings/
+/.classpath
+/.project
+*.iml
+*.ipr
+*.iws
+*.launch
+
+# Forge MDK source archives
+/forge*changelog.txt
+/forge-*-mdk.zip

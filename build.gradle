@@ -1,0 +1,116 @@
+buildscript {
+    repositories {
+        maven { url = 'https://maven.minecraftforge.net/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:5.1.40'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
+
+configurations {
+    forgeUniversal
+    runtimeClasspath {
+        // MergeTool is only required while ForgeGradle creates the mapped jar.
+        // Its transitive ASM jars contain module-info.class files that 1.12.2
+        // FML cannot scan during development runs.
+        exclude group: 'net.minecraftforge', module: 'mergetool'
+    }
+}
+
+version = '1.1.0'
+group = 'dev.julian.ezshow'
+archivesBaseName = 'ezshow-forge-1.12.2'
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.withType(org.gradle.api.tasks.bundling.AbstractArchiveTask).configureEach {
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+
+processResources {
+    inputs.property 'version', project.version
+    inputs.property 'mcversion', '1.12.2'
+    filesMatching('mcmod.info') {
+        expand version: project.version, mcversion: '1.12.2'
+    }
+}
+
+minecraft {
+    mappings channel: 'snapshot', version: '20171003-1.12'
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+        }
+
+        server {
+            workingDirectory project.file('run')
+            args '--port', '25566'
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+        }
+    }
+}
+
+dependencies {
+    minecraft('net.minecraftforge:forge:1.12.2-14.23.5.2859') {
+        exclude group: 'net.minecraftforge', module: 'mergetool'
+    }
+    forgeUniversal('net.minecraftforge:forge:1.12.2-14.23.5.2859:universal') {
+        transitive = false
+    }
+    testImplementation 'junit:junit:4.13.2'
+}
+
+sourceSets.each {
+    def dir = layout.buildDirectory.file("sourceSets/$it.name").get().asFile
+    it.output.resourcesDir = dir
+    it.java.destinationDirectory.set(dir)
+}
+
+// ForgeGradle's legacy merge can leave an obsolete Side enum in development
+// runs. Use Forge's universal Side class only for runClient/runServer; it is
+// never packaged into ezshow's jar.
+def forgeUserdevFixDir = layout.buildDirectory.dir('forgeUserdevFix')
+
+tasks.register('prepareForgeUserdevFix', Sync) {
+    from({ zipTree(configurations.forgeUniversal.singleFile) }) {
+        include 'net/minecraftforge/fml/relauncher/Side.class'
+    }
+    into forgeUserdevFixDir
+}
+
+tasks.matching {
+    it.name == 'runClient' || it.name == 'runServer'
+}.configureEach {
+    dependsOn tasks.named('prepareForgeUserdevFix')
+    doFirst {
+        classpath = project.files(forgeUserdevFixDir) + classpath
+    }
+}
+
+jar {
+    manifest {
+        attributes([
+            "Specification-Title": "ezshow",
+            "Specification-Vendor": "Julian",
+            "Specification-Version": "1",
+            "Implementation-Title": project.name,
+            "Implementation-Version": "${project.version}",
+            "Implementation-Vendor": "Julian"
+        ])
+    }
+}
+
+jar.finalizedBy('reobfJar')

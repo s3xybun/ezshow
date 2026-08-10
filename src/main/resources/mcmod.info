@@ -1,0 +1,16 @@
+[
+{
+  "modid": "ezshow",
+  "name": "ezshow",
+  "description": "Share the item in your hand to chat with a rich hover tooltip.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Julian"],
+  "credits": "Item sharing interaction inspired by Quark.",
+  "logoFile": "assets/ezshow/logo.png",
+  "screenshots": [],
+  "dependencies": ["required-after:forge@[14.23.5.2859,)"]
+}
+]
