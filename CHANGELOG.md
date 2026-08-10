@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.1
+
+- Change the default per-player cooldown from 5 seconds to 3 seconds.
+- Align the English README with the revised Simplified Chinese user guide.
+
 ## 1.1.0
 
 - Keep `/show` as the only command form; remove the `main` and `off` arguments.

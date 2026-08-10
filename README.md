@@ -4,11 +4,13 @@
 
 <h1 align="center">ezshow</h1>
 
-<p align="center">Share the item in your hand. Let chat show the details.</p>
+<p align="center">
+  English
+  ·
+  <a href="README-zh.md">简体中文</a>
+</p>
 
 <p align="center">
-  <a href="README-zh.md">简体中文</a>
-  ·
   <img alt="Minecraft 1.12.2" src="https://img.shields.io/badge/Minecraft-1.12.2-62b47a?style=flat-square">
   <img alt="Forge 14.23.5.2859" src="https://img.shields.io/badge/Forge-14.23.5.2859-e56b2f?style=flat-square">
   <img alt="Java 8" src="https://img.shields.io/badge/Java-8-5382a1?style=flat-square">
@@ -17,7 +19,7 @@
 
 ezshow is a focused Minecraft Forge 1.12.2 mod for sharing held items in chat. Type `/show` to send a message such as `Steve: [Diamond Sword]`. Hover the item to see its normal tooltip, including enchantments, durability, lore, and modded NBT data.
 
-The interaction is inspired by Quark's Item Sharing, with a narrow focus on server-only deployment, cooldowns, permissions, and correct per-client item-name localization.
+ezshow stays independent, lightweight, and minimal while supporting server-only installation, cooldowns, permissions, and correct item-name display for clients using different languages.
 
 ## Features
 
@@ -25,14 +27,14 @@ The interaction is inspired by Quark's Item Sharing, with a narrow focus on serv
 - Main hand first; automatically falls back to the off hand when the main hand is empty.
 - Vanilla `SHOW_ITEM` hover data for broad compatibility with registered mod items.
 - Default item names are translated by each viewer's client; anvil and other custom names remain unchanged.
-- Configurable per-player cooldown, with `0` disabling it.
+- A per-player cooldown prevents chat spam and can be disabled with `0`.
 - Forge PermissionAPI nodes that permission mods can override.
 - The same JAR works in single player, on a LAN host, or as a dedicated-server-only mod.
 
 ## Installation
 
 1. Use Minecraft 1.12.2 with Forge 14.23.5.2859 or a compatible newer 1.12.2 Forge build.
-2. Put the ezshow JAR in the relevant `mods` folder.
+2. Put `ezshow.jar` in the relevant `mods` folder.
 3. Start or restart the game/server.
 
 | Where you play | Install ezshow on | Client installation required? |
@@ -40,8 +42,6 @@ The interaction is inspired by Quark's Item Sharing, with a narrow focus on serv
 | Dedicated server | Server | No |
 | Single player / LAN host | Hosting client | Yes, on the host |
 | Remote server without ezshow | Client only | Unsupported |
-
-Both sides still need any content mod that owns the shared item. Only ezshow itself may be server-only.
 
 ## Usage
 
@@ -56,6 +56,7 @@ Selection is deterministic:
 1. A non-empty main hand is shared.
 2. Otherwise, a non-empty off hand is shared.
 3. If both hands are empty, the command shows the localized correct usage: `/show`.
+4. A 3-second cooldown is enabled by default.
 
 Arguments are not supported. Invalid arguments and requests rejected by the cooldown also show the correct `/show` usage without broadcasting a message.
 
@@ -65,7 +66,7 @@ Forge creates `config/ezshow.cfg` after the first launch:
 
 ```text
 general {
-    I:cooldownSeconds=5
+    I:cooldownSeconds=3
 
     permissions {
         S:bypassCooldown=OP
@@ -83,12 +84,3 @@ general {
 | `ezshow.cooldown.bypass` | `OP` | Bypasses the cooldown. |
 
 Permission mods that provide a Forge 1.12.2 PermissionAPI handler can manage these nodes directly.
-
-## Compatibility notes
-
-- Clients do not need ezshow when it is installed on a dedicated server.
-- No client-only Minecraft classes are loaded by ezshow on a dedicated server.
-- Hover details are reconstructed by the receiving client from the standard serialized item stack.
-- Items with ordinary translation keys, translatable NBT names, and literal custom names are supported. A mod that generates its visible item name entirely in server-side code may still display its fallback translation key in the chat label; its hover tooltip remains authoritative.
-
-Please include the Minecraft version, Forge version, ezshow version, and the affected item's owning mod when reporting a compatibility issue.

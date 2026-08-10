@@ -21,7 +21,7 @@ configurations {
     }
 }
 
-version = '1.1.0'
+version = '1.1.1'
 group = 'dev.julian.ezshow'
 archivesBaseName = 'ezshow-forge-1.12.2'
 

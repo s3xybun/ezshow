@@ -18,7 +18,7 @@ The interaction is inspired by Quark's Item Sharing. ezshow is not intended to r
 
 ## Supported scope
 
-Current release: `1.1.0`.
+Current release: `1.1.1`.
 
 | Dimension | Supported |
 | --- | --- |
@@ -142,7 +142,7 @@ Forge owns `config/ezshow.cfg` through `EzShowConfig`.
 
 | Setting | Default | Range / values | Restart |
 | --- | --- | --- | --- |
-| `cooldownSeconds` | `5` | `0..86400` | No for a directly reloaded config; normal file edits are safest with restart |
+| `cooldownSeconds` | `3` | `0..86400` | No for a directly reloaded config; normal file edits are safest with restart |
 | `permissions.showCommand` | `ALL` | `ALL`, `OP`, `NONE` | Yes |
 | `permissions.bypassCooldown` | `OP` | `ALL`, `OP`, `NONE` | Yes |
 

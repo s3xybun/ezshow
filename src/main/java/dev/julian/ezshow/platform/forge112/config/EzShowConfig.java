@@ -12,7 +12,7 @@ public final class EzShowConfig {
         "Set to 0 to disable the cooldown."
     })
     @Config.RangeInt(min = 0, max = 86400)
-    public static int cooldownSeconds = 5;
+    public static int cooldownSeconds = 3;
 
     @Config.Name("permissions")
     @Config.Comment("Default permission policy. Changes require a game/server restart.")
