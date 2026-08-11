@@ -20,16 +20,17 @@ public final class CooldownGate<K> {
             throw new IllegalArgumentException("duration must not be negative");
         }
 
+        if (duration == 0L) {
+            deadlines.remove(key);
+            return true;
+        }
+
         Long deadline = deadlines.get(key);
         if (deadline != null && now - deadline < 0L) {
             return false;
         }
 
-        if (duration == 0L) {
-            deadlines.remove(key);
-        } else {
-            deadlines.put(key, now + duration);
-        }
+        deadlines.put(key, now + duration);
         return true;
     }
 

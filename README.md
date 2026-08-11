@@ -17,16 +17,16 @@
   <img alt="Client or server" src="https://img.shields.io/badge/Install-client%20or%20server-11a8cd?style=flat-square">
 </p>
 
-ezshow is a focused Minecraft Forge 1.12.2 mod for sharing held items in chat. Type `/show` to send a message such as `Steve: [Diamond Sword]`. Hover the item to see its normal tooltip, including enchantments, durability, lore, and modded NBT data.
+ezshow is a focused Minecraft Forge 1.12.2 mod for sharing held items in chat. Type `/show` to send a message such as `<Steve> [Diamond Sword]`, using the same outer format as ordinary player chat. Hover the item to see its normal tooltip, including enchantments, durability, lore, and modded NBT data.
 
-ezshow stays independent, lightweight, and minimal while supporting server-only installation, cooldowns, permissions, and correct item-name display for clients using different languages.
+ezshow stays independent, lightweight, and minimal while supporting server-only installation, cooldowns, permissions, and per-viewer localization of ordinary item names.
 
 ## Features
 
 - One command: `/show`.
 - Main hand first; automatically falls back to the off hand when the main hand is empty.
 - Vanilla `SHOW_ITEM` hover data for broad compatibility with registered mod items.
-- Default item names are translated by each viewer's client; anvil and other custom names remain unchanged.
+- Default item names are translated by each viewer's client; anvil names and dynamically assembled mod item names preserve the item's own display text.
 - A per-player cooldown prevents chat spam and can be disabled with `0`.
 - Forge PermissionAPI nodes that permission mods can override.
 - The same JAR works in single player, on a LAN host, or as a dedicated-server-only mod.

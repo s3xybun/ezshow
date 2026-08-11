@@ -11,7 +11,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -67,17 +67,17 @@ public final class ShowCommand extends CommandBase {
             }
         }
 
-        server.getPlayerList().sendMessage(createShareMessage(player, stack.copy()), false);
+        server.getPlayerList().sendMessage(createShareMessage(
+            player.getDisplayName(),
+            ItemTextComponentFactory.create(stack.copy())
+        ), false);
     }
 
     static ItemStack selectHeldItem(ItemStack mainHand, ItemStack offHand) {
         return mainHand.isEmpty() ? offHand : mainHand;
     }
 
-    private ITextComponent createShareMessage(EntityPlayerMP player, ItemStack stack) {
-        return new TextComponentString("")
-            .appendSibling(player.getDisplayName())
-            .appendText(": ")
-            .appendSibling(ItemTextComponentFactory.create(stack));
+    static ITextComponent createShareMessage(ITextComponent playerDisplayName, ITextComponent itemComponent) {
+        return new TextComponentTranslation("chat.type.text", playerDisplayName, itemComponent);
     }
 }

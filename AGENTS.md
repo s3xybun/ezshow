@@ -18,7 +18,7 @@ The interaction is inspired by Quark's Item Sharing. ezshow is not intended to r
 
 ## Supported scope
 
-Current release: `1.1.1`.
+Current release: `1.1.2`.
 
 | Dimension | Supported |
 | --- | --- |
@@ -44,9 +44,9 @@ These rules define `/show` and must not drift accidentally:
 - Invalid, empty-hand, and rejected attempts do not start or extend the cooldown.
 - The cooldown is per player UUID, is in memory, and resets when the server process or integrated server restarts.
 - Players with `ezshow.cooldown.bypass` neither check nor acquire a cooldown.
-- A successful message has the shape `<player display name>: [<item name>]`.
+- A successful message uses vanilla `chat.type.text`, normally rendering as `<player display name> [<item name>]`.
 - The visible item name and hover data come from a defensive copy of the selected stack.
-- Default item names are resolved by each receiving client. Literal custom names remain literal and italic, matching vanilla behavior.
+- Default item names are resolved by each receiving client. Literal custom names remain literal and italic, matching vanilla behavior. Item-defined dynamic names that cannot be represented by the inferred default translation key remain literal.
 - The full serialized stack drives the vanilla `SHOW_ITEM` hover event.
 
 Do not catch broad runtime failures and disguise them as usage errors. Bad input and expected policy rejection use `WrongUsageException`; unexpected failures should remain visible in the server log.
@@ -111,7 +111,8 @@ Minecraft 1.12.2's implementation eagerly calls `ItemStack#getDisplayName()` and
 
 - NBT `display.Name` becomes a literal italic `TextComponentString`.
 - NBT `display.LocName` remains a `TextComponentTranslation`.
-- An ordinary stack uses `item.getUnlocalizedName(stack) + ".name"` as a `TextComponentTranslation`.
+- An ordinary stack sends the raw `item.getUnlocalizedName(stack) + ".name"` key as a `TextComponentTranslation`; never send a key produced by server localization.
+- Compare the item's actual display name with vanilla's default `getUnlocalizedNameInefficiently()` display path only to detect item-defined dynamic naming. If they differ, preserve the returned display text instead of exposing an invalid inferred key.
 - Hover payload and rarity color use the same public vanilla/Forge APIs as `ItemStack#getTextComponent()`.
 
 This is intentionally not a general text framework. Keep it package-private and covered by focused tests.
@@ -120,7 +121,7 @@ This is intentionally not a general text framework. Keep it package-private and 
 
 A dedicated-server-only installation cannot assume clients have ezshow translation resources. The previous implementation reflected into `EntityPlayerMP` to read its language and parsed `.lang` files on the server. That duplicated platform behavior and was fragile under mappings.
 
-All expected failures now throw `WrongUsageException("/show")`. Vanilla wraps it in the built-in `commands.generic.usage` component, so every unmodified client localizes the prefix and receives the literal, universally valid `/show` usage. Permission denial likewise uses vanilla command feedback. The packaged `en_us.lang` is only a standard Forge resource marker that avoids FML's missing-English-resource warning; it contains no custom command messages and is not parsed by ezshow.
+All expected failures now throw `WrongUsageException("/show")`. Vanilla wraps it in the built-in `commands.generic.usage` component, so every unmodified client localizes the prefix and receives the literal, universally valid `/show` usage. Permission denial likewise uses vanilla command feedback. The packaged `en_us.lang` is only a standard Forge resource marker that avoids FML's missing-English-resource warning; it contains no custom command messages and is not parsed by ezshow. The narrow dynamic-name check uses vanilla's server-safe `net.minecraft.util.text.translation.I18n` lookup but does not load or parse language files itself.
 
 Do not add locale reflection, client-only `I18n`, or a custom server translation parser unless a future user-visible requirement cannot be expressed through vanilla components.
 
@@ -220,7 +221,8 @@ The tests must cover at least:
 
 - cooldown first use, rejection, deadline expiry, independent keys, disabled duration, and timer wraparound;
 - main-hand priority, off-hand fallback, and both-hands-empty selection;
-- default item translation keys, literal custom names, and NBT translatable names.
+- default item translation keys, literal custom names, NBT translatable names, and item-defined dynamic names;
+- the vanilla `chat.type.text` wrapper for successful shares;
 
 Before a release, perform a real Forge runtime matrix:
 
@@ -232,7 +234,7 @@ Before a release, perform a real Forge runtime matrix:
 6. Main hand occupied plus off hand occupied: main hand wins.
 7. Main hand empty plus off hand occupied: off hand is shared.
 8. Both hands empty, extra arguments, and cooldown rejection: localized usage ending in `/show`.
-9. Enchanted, damaged, lore-bearing, and representative modded items: hover details remain correct.
+9. Enchanted, damaged, lore-bearing, and representative modded items: hover details remain correct; dynamically composed names do not expose raw translation keys.
 10. Permission defaults and a PermissionAPI provider, if available.
 
 Static build success is not evidence of dedicated-server or client-rendering behavior. Record which runtime cases were actually observed.

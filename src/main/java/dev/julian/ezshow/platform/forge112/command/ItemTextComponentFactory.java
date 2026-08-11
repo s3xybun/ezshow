@@ -7,9 +7,10 @@ import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.event.HoverEvent;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraftforge.common.util.Constants;
 
-/** Creates an item chat component without localizing its default name on the server. */
+/** Creates an item chat component while keeping ordinary names client-localizable. */
 final class ItemTextComponentFactory {
     private ItemTextComponentFactory() {
     }
@@ -41,6 +42,13 @@ final class ItemTextComponentFactory {
         }
 
         String translationKey = stack.getItem().getUnlocalizedName(stack) + ".name";
+        String defaultDisplayKey = stack.getItem().getUnlocalizedNameInefficiently(stack) + ".name";
+        String defaultDisplayName = I18n.translateToLocal(defaultDisplayKey).trim();
+        String actualDisplayName = stack.getDisplayName();
+        if (!actualDisplayName.equals(defaultDisplayName)) {
+            return new TextComponentString(actualDisplayName);
+        }
+
         return new TextComponentTranslation(translationKey);
     }
 }

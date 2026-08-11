@@ -30,6 +30,27 @@ public class ItemTextComponentFactoryTest {
     }
 
     @Test
+    public void serverLocalizationCannotChangeTheClientTranslationKey() {
+        Item item = new Item() {
+            @Override
+            public String getUnlocalizedName(ItemStack stack) {
+                return "item.ezshow.raw_name";
+            }
+
+            @Override
+            public String getUnlocalizedNameInefficiently(ItemStack stack) {
+                return "server-localized-name";
+            }
+        };
+        ItemStack stack = new ItemStack(item);
+
+        ITextComponent name = ItemTextComponentFactory.createVisibleName(stack);
+
+        assertTrue(name instanceof TextComponentTranslation);
+        assertEquals("item.ezshow.raw_name.name", ((TextComponentTranslation) name).getKey());
+    }
+
+    @Test
     public void explicitStackNameRemainsLiteralAndItalic() {
         ItemStack stack = new ItemStack(new Item());
         stack.setStackDisplayName("宝剑");
@@ -50,5 +71,21 @@ public class ItemTextComponentFactoryTest {
 
         assertTrue(name instanceof TextComponentTranslation);
         assertEquals("item.ezshow.localized_name", ((TextComponentTranslation) name).getKey());
+    }
+
+    @Test
+    public void dynamicallyComposedItemNameUsesTheItemsDisplayName() {
+        Item item = new Item() {
+            @Override
+            public String getItemStackDisplayName(ItemStack stack) {
+                return "Golden Spear";
+            }
+        }.setUnlocalizedName("ezshow.dynamic_item");
+        ItemStack stack = new ItemStack(item);
+
+        ITextComponent name = ItemTextComponentFactory.createVisibleName(stack);
+
+        assertTrue(name instanceof TextComponentString);
+        assertEquals("Golden Spear", ((TextComponentString) name).getText());
     }
 }

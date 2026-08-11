@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.2
+
+- Preserve item-defined dynamic display names instead of exposing an inferred raw translation key.
+- Format successful shares with vanilla's ordinary player-chat component.
+- Clear an existing player cooldown immediately when `cooldownSeconds` is reloaded to `0`.
+
 ## 1.1.1
 
 - Change the default per-player cooldown from 5 seconds to 3 seconds.

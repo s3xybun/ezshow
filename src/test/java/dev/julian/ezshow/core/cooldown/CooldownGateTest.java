@@ -40,6 +40,15 @@ public class CooldownGateTest {
     }
 
     @Test
+    public void zeroDurationClearsAnExistingDeadlineImmediately() {
+        CooldownGate<String> gate = new CooldownGate<>();
+        gate.tryAcquire("steve", 100L, 50L);
+
+        assertTrue(gate.tryAcquire("steve", 120L, 0L));
+        assertTrue(gate.tryAcquire("steve", 120L, 10L));
+    }
+
+    @Test
     public void nanoTimeWrapAroundStillHonorsDeadline() {
         CooldownGate<String> gate = new CooldownGate<>();
         long start = Long.MAX_VALUE - 5L;
